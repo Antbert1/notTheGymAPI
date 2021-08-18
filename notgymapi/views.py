@@ -2,10 +2,14 @@ from django.shortcuts import render
 
 from rest_framework import viewsets, status
 from rest_framework.response import Response
+from rest_framework.authentication import TokenAuthentication
 
 from .serializers import ClassdetailSerializer
 from .models import Classdetail
+from notgymapi import models
+from notgymapi import serializers
 import datetime
+from notgymapi import permissions
 
 
 class ClassdetailViewSet(viewsets.ModelViewSet):
@@ -43,8 +47,9 @@ class ClassdetailViewSet(viewsets.ModelViewSet):
             self.perform_create(serializer)
             headers = self.get_success_headers(serializer.data)
 
-            return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
-
+            return Response(
+                serializer.data, status=status.HTTP_201_CREATED, headers=headers
+            )
 
     # def get_queryset(self):
     #     question = self.request.query_params.get('question')
@@ -59,7 +64,11 @@ class ClassdetailViewSet(viewsets.ModelViewSet):
     #     else:
     #         queryset = Answer.objects.all()
 
-
-        
-
     #     return queryset
+
+
+class UserProfileViewSet(viewsets.ModelViewSet):
+    serializer_class = serializers.UserProfileSerializer
+    queryset = models.UserProfile.objects.all()
+    authentication_classes = (TokenAuthentication,)
+    permission_classes = (permissions.UpdateOwnProfile,)

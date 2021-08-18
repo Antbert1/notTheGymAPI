@@ -17,6 +17,32 @@ import dotenv
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+if os.name == "nt":
+    VIRTUAL_ENV_BASE = os.environ["VIRTUAL_ENV"]
+    os.environ["PATH"] = (
+        os.path.join(VIRTUAL_ENV_BASE, r".\Lib\site-packages\osgeo")
+        + ";"
+        + os.environ["PATH"]
+    )
+    os.environ["PROJ_LIB"] = (
+        os.path.join(VIRTUAL_ENV_BASE, r".\Lib\site-packages\osgeo\data\proj")
+        + ";"
+        + os.environ["PATH"]
+    )
+
+
+# if os.name == "nt":
+#     import platform
+
+#     OSGEO4W = r"C:\OSGeo4W"
+#     # if "64" in platform.architecture()[0]:
+#     #     OSGEO4W += "64"
+#     assert os.path.isdir(OSGEO4W), "Directory does not exist: " + OSGEO4W
+#     os.environ["OSGEO4W_ROOT"] = OSGEO4W
+#     os.environ["GDAL_DATA"] = OSGEO4W + r"\share\gdal"
+#     os.environ["PROJ_LIB"] = OSGEO4W + r"\share\proj"
+#     os.environ["PATH"] = OSGEO4W + r"\bin;" + os.environ["PATH"]
+
 dotenv_file = os.path.join(BASE_DIR, ".env")
 if os.path.isfile(dotenv_file):
     dotenv.load_dotenv(dotenv_file)
@@ -45,6 +71,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "rest_framework",
     "rest_framework.authtoken",
+    "django.contrib.gis",
     "notgymapi",
 ]
 
@@ -84,7 +111,7 @@ WSGI_APPLICATION = "notthegym.wsgi.application"
 
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.postgresql",
+        "ENGINE": "django.contrib.gis.db.backends.postgis",
         "NAME": "notgym_db",
         "USER": os.environ["DB_USERNAME"],
         "PASSWORD": os.environ["PASSWORD"],
@@ -135,3 +162,5 @@ STATIC_URL = "/static/"
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+AUTH_USER_MODEL = "notgymapi.UserProfile"
